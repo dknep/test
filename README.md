@@ -1,64 +1,51 @@
-# test
+import java.util.*;
 
+public class TaskMaster {
+    public static int tasks(int n, int[] a, int[] b) {
+        // Step 1: Build the Graph (Adjacency List)
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        int[] inDegree = new int[n + 1]; // To track incoming edges
 
+        for (int i = 0; i < a.length; i++) {
+            graph.putIfAbsent(a[i], new ArrayList<>());
+            graph.get(a[i]).add(b[i]);
+            inDegree[b[i]]++; // Increment in-degree of dependent task
+        }
 
+        // Step 2: Topological Sorting using Kahn's Algorithm
+        Queue<Integer> queue = new LinkedList<>();
+        int count = 0;
 
-import { Component } from '@angular/core';
+        // Add all tasks with no dependencies (inDegree == 0) to queue
+        for (int i = 1; i <= n; i++) {
+            if (inDegree[i] == 0) {
+                queue.add(i);
+            }
+        }
 
-@Component({
-  selector: 'app-line-chart',
-  templateUrl: './line-chart.component.html',
-  styleUrls: ['./line-chart.component.css'],
-})
-export class LineChartComponent {
-  // Line Chart Data
-  public lineChartData = {
-    datasets: [
-      {
-        label: 'Sample Data',
-        data: Array.from({ length: 100 }, (_, i) => ({ x: i, y: Math.random() * 100 })),
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 2,
-        fill: false,
-      },
-    ],
-  };
+        while (!queue.isEmpty()) {
+            int task = queue.poll();
+            count++; // Task is completed
+            
+            if (graph.containsKey(task)) {
+                for (int dependent : graph.get(task)) {
+                    inDegree[dependent]--;
+                    if (inDegree[dependent] == 0) {
+                        queue.add(dependent);
+                    }
+                }
+            }
+        }
 
-  // Line Chart Options
-  public lineChartOptions: any = {
-    responsive: true,
-    scales: {
-      x: {
-        type: 'linear',
-        title: {
-          display: true,
-          text: 'X Axis',
-        },
-        ticks: {
-          padding: 10, // Adds 10px padding between labels
-          callback: function (value, index, ticks) {
-            // Optionally, you can limit how many labels to show for readability
-            return index % 5 === 0 ? value : '';
-          },
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Y Axis',
-        },
-        beginAtZero: true,
-        ticks: {
-          padding: 10, // Adds 10px padding to Y-axis labels as well
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top',
-      },
-    },
-    maintainAspectRatio: false, // Adjust chart size
-  };
+        // Step 3: Compute the maximum tasks that can be completed
+        return count;
+    }
+
+    public static void main(String[] args) {
+        int n = 7;
+        int[] a = {1, 2, 3, 4, 6, 5};
+        int[] b = {7, 6, 4, 1, 2, 1};
+
+        System.out.println("Maximum tasks Eric can complete: " + tasks(n, a, b));
+    }
 }
