@@ -1,38 +1,39 @@
-
 import java.util.*;
 
-public class NeuralTaskAllocation {
-    public static int maxTasksCompleted(int n, int[] tasks, int m) {
-        // Step 1: Count occurrences of each task
-        Map<Integer, Integer> taskFrequency = new HashMap<>();
-        for (int task : tasks) {
-            taskFrequency.put(task, taskFrequency.getOrDefault(task, 0) + 1);
-        }
+public class SubsequenceSort {
+    // Function to check if a given binary string can be sorted into "000...111"
+    public static boolean canBeSorted(String binary) {
+        // The only condition where it's NOT possible to sort is if "10" exists in the string.
+        return !binary.contains("10");
+    }
 
-        // Step 2: Sort tasks by frequency (descending order)
-        List<Integer> frequencies = new ArrayList<>(taskFrequency.values());
-        Collections.sort(frequencies, Collections.reverseOrder());
+    // Function to check each query in arr
+    public static List<String> checkQueries(String binary, String[] arr) {
+        List<String> result = new ArrayList<>();
 
-        // Step 3: Distribute tasks across m nodes
-        int[] nodeLoad = new int[m];  // Tracks the number of tasks each node has
-        int completedTasks = 0;
+        for (String query : arr) {
+            // Replace '?' with both '0' and '1' to check all possibilities
+            String minQuery = query.replace('?', '0'); // Try all '?' as '0'
+            String maxQuery = query.replace('?', '1'); // Try all '?' as '1'
 
-        for (int freq : frequencies) {
-            Arrays.sort(nodeLoad); // Always assign to the least loaded node
-            for (int i = 0; i < Math.min(m, freq); i++) { // Distribute among nodes
-                nodeLoad[i]++;
-                completedTasks++;
+            // If either version can be sorted into "000...111", it's a YES
+            if (canBeSorted(minQuery) || canBeSorted(maxQuery)) {
+                result.add("YES");
+            } else {
+                result.add("NO");
             }
         }
 
-        return completedTasks;
+        return result;
     }
 
     public static void main(String[] args) {
-        int n = 4;
-        int[] tasks = {1, 2, 1, 1, 2};
-        int m = 2;
+        String binary = "101";
+        String[] arr = {"1?1", "0??", "110", "0?1"};
 
-        System.out.println("Maximum tasks completed: " + maxTasksCompleted(n, tasks, m));
+        List<String> results = checkQueries(binary, arr);
+        for (String res : results) {
+            System.out.println(res);
+        }
     }
 }
