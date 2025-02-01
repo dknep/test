@@ -1,35 +1,36 @@
+
 import java.util.*;
 
 public class NeuralTaskAllocation {
     public static int maxTasksCompleted(int n, int[] tasks, int m) {
-        // List of sets to track unique tasks assigned to each node
-        List<Set<Integer>> nodes = new ArrayList<>();
-        for (int i = 0; i < m; i++) {
-            nodes.add(new HashSet<>()); // Each node has a set of unique tasks
+        // Step 1: Count occurrences of each task
+        Map<Integer, Integer> taskFrequency = new HashMap<>();
+        for (int task : tasks) {
+            taskFrequency.put(task, taskFrequency.getOrDefault(task, 0) + 1);
         }
 
+        // Step 2: Sort tasks by frequency (descending order)
+        List<Integer> frequencies = new ArrayList<>(taskFrequency.values());
+        Collections.sort(frequencies, Collections.reverseOrder());
+
+        // Step 3: Distribute tasks across m nodes
+        int[] nodeLoad = new int[m];  // Tracks the number of tasks each node has
         int completedTasks = 0;
-        
-        // Try to allocate tasks efficiently
-        for (int task : tasks) {
-            // Try assigning the task to any node that does not already have it
-            boolean assigned = false;
-            for (Set<Integer> node : nodes) {
-                if (!node.contains(task)) {
-                    node.add(task);
-                    completedTasks++;
-                    assigned = true;
-                    break; // Move to the next task once assigned
-                }
+
+        for (int freq : frequencies) {
+            Arrays.sort(nodeLoad); // Always assign to the least loaded node
+            for (int i = 0; i < Math.min(m, freq); i++) { // Distribute among nodes
+                nodeLoad[i]++;
+                completedTasks++;
             }
         }
-        
+
         return completedTasks;
     }
 
     public static void main(String[] args) {
-        int n = 7;
-        int[] tasks = {1, 2, 2, 1, 3, 1, 3};
+        int n = 4;
+        int[] tasks = {1, 2, 1, 1, 2};
         int m = 2;
 
         System.out.println("Maximum tasks completed: " + maxTasksCompleted(n, tasks, m));
