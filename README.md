@@ -1,51 +1,37 @@
 import java.util.*;
 
-public class TaskMaster {
-    public static int tasks(int n, int[] a, int[] b) {
-        // Step 1: Build the Graph (Adjacency List)
-        Map<Integer, List<Integer>> graph = new HashMap<>();
-        int[] inDegree = new int[n + 1]; // To track incoming edges
-
-        for (int i = 0; i < a.length; i++) {
-            graph.putIfAbsent(a[i], new ArrayList<>());
-            graph.get(a[i]).add(b[i]);
-            inDegree[b[i]]++; // Increment in-degree of dependent task
+public class NeuralTaskAllocation {
+    public static int maxTasksCompleted(int n, int[] tasks, int m) {
+        // List of sets to track unique tasks assigned to each node
+        List<Set<Integer>> nodes = new ArrayList<>();
+        for (int i = 0; i < m; i++) {
+            nodes.add(new HashSet<>()); // Each node has a set of unique tasks
         }
 
-        // Step 2: Topological Sorting using Kahn's Algorithm
-        Queue<Integer> queue = new LinkedList<>();
-        int count = 0;
-
-        // Add all tasks with no dependencies (inDegree == 0) to queue
-        for (int i = 1; i <= n; i++) {
-            if (inDegree[i] == 0) {
-                queue.add(i);
-            }
-        }
-
-        while (!queue.isEmpty()) {
-            int task = queue.poll();
-            count++; // Task is completed
-            
-            if (graph.containsKey(task)) {
-                for (int dependent : graph.get(task)) {
-                    inDegree[dependent]--;
-                    if (inDegree[dependent] == 0) {
-                        queue.add(dependent);
-                    }
+        int completedTasks = 0;
+        
+        // Try to allocate tasks efficiently
+        for (int task : tasks) {
+            // Try assigning the task to any node that does not already have it
+            boolean assigned = false;
+            for (Set<Integer> node : nodes) {
+                if (!node.contains(task)) {
+                    node.add(task);
+                    completedTasks++;
+                    assigned = true;
+                    break; // Move to the next task once assigned
                 }
             }
         }
-
-        // Step 3: Compute the maximum tasks that can be completed
-        return count;
+        
+        return completedTasks;
     }
 
     public static void main(String[] args) {
         int n = 7;
-        int[] a = {1, 2, 3, 4, 6, 5};
-        int[] b = {7, 6, 4, 1, 2, 1};
+        int[] tasks = {1, 2, 2, 1, 3, 1, 3};
+        int m = 2;
 
-        System.out.println("Maximum tasks Eric can complete: " + tasks(n, a, b));
+        System.out.println("Maximum tasks completed: " + maxTasksCompleted(n, tasks, m));
     }
 }
