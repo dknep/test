@@ -1,39 +1,17 @@
-import java.util.*;
+# Navigate to the project directory
+cd /home/ubuntu/1792024-git-excluding-specific-files-and-directories
 
-public class SubsequenceSort {
-    // Function to check if a given binary string can be sorted into "000...111"
-    public static boolean canBeSorted(String binary) {
-        // The only condition where it's NOT possible to sort is if "10" exists in the string.
-        return !binary.contains("10");
-    }
+# Add the .env file and cache/ directory to .gitignore
+echo ".env" >> .gitignore
+echo "cache/" >> .gitignore
 
-    // Function to check each query in arr
-    public static List<String> checkQueries(String binary, String[] arr) {
-        List<String> result = new ArrayList<>();
+# Remove them from Git tracking (but keep them in the filesystem)
+git rm --cached .env
+git rm -r --cached cache/
 
-        for (String query : arr) {
-            // Replace '?' with both '0' and '1' to check all possibilities
-            String minQuery = query.replace('?', '0'); // Try all '?' as '0'
-            String maxQuery = query.replace('?', '1'); // Try all '?' as '1'
+# Commit the changes
+git add .gitignore
+git commit -m "Exclude .env and cache/ from tracking"
 
-            // If either version can be sorted into "000...111", it's a YES
-            if (canBeSorted(minQuery) || canBeSorted(maxQuery)) {
-                result.add("YES");
-            } else {
-                result.add("NO");
-            }
-        }
-
-        return result;
-    }
-
-    public static void main(String[] args) {
-        String binary = "101";
-        String[] arr = {"1?1", "0??", "110", "0?1"};
-
-        List<String> results = checkQueries(binary, arr);
-        for (String res : results) {
-            System.out.println(res);
-        }
-    }
-}
+# Push the changes (if required)
+git push origin main  # Change 'main' to the correct branch if needed
